@@ -1,3 +1,5 @@
+import asyncio
+
 import sha
 from sha.points import *
 from time import sleep
@@ -25,45 +27,46 @@ def disable_super_click():
         SUPER_CLICK))
 
 
-def on_press(key):
+async def handle_key_press(key):
     try:
         if key.char == 'p':
             sha.print_mouse()
 
         elif key.char == 'a':
-            sha.click(POS_BOSS, 2)
+            await sha.click(POS_BOSS, 2)
             sha.move_to(POS_TABLE_CENTER)
 
         elif key.char == 'q':
-            sha.click(POS_DISH_1, 3)
+            await sha.click(POS_DISH_1, 3)
             print('Dish 1 clicked')
-            sha.click(POS_DISH_2, 3)
+            await sha.click(POS_DISH_2, 3)
             print('Dish 2 clicked')
-            sha.click(POS_DISH_3, 3)
+            await sha.click(POS_DISH_3, 3)
             print('Dish 3 clicked')
-            sha.click(POS_DISH_4, 3)
+            await sha.click(POS_DISH_4, 3)
             print('Dish 4 clicked')
             sleep(.4)
-            sha.swipe(POS_CAKE_BOTTOM, POS_CAKE_TOP, 0.2)
+            await sha.swipe(POS_CAKE_BOTTOM, POS_CAKE_TOP, 0.2)
             print('Cake swiped')
             sleep(.05)
-            sha.click(POS_WRAPPING_MACHINE, 3, 0.08)
+            await sha.click(POS_WRAPPING_MACHINE, 3, 0.08)
             print('Wrapping machine clicked')
             sha.move_to(POS_TABLE_CENTER)
 
         elif key.char == 'w':
-            sha.click(POS_POTATO_FRY, 4)
+            await sha.click(POS_POTATO_FRY, 4)
             print('Potato fry clicked')
             sha.move_to(POS_TABLE_CENTER)
 
         elif key.char == 'e':
-            sha.click_hold(POS_POTATO, 3)
+            await sha.swipe(POS_TABLE_LEFT, POS_TABLE_RIGHT, .2)
+            await sha.click(POS_POTATO_FRY, 2)
+            await sha.click_hold(POS_POTATO, 3)
             print('Potato clicked')
-            sha.click(POS_POTATO_FRY, 1)
             sha.move_to(POS_TABLE_CENTER)
 
         elif key.char == 'c':
-            sha.swipe(POS_TABLE_LEFT, POS_TABLE_RIGHT, .3)
+            await sha.swipe(POS_TABLE_LEFT, POS_TABLE_RIGHT, .2)
             print('Table swiped')
             sha.move_to(POS_TABLE_CENTER)
 
@@ -84,7 +87,7 @@ def on_press(key):
             enable_super_click()
 
 
-def on_release(key):
+async def handle_key_release(key):
     print('{0} released'.format(
         key))
     if key == keyboard.Key.esc:
@@ -99,6 +102,18 @@ def on_release(key):
             disable_super_click()
     except AttributeError:
         pass
+
+
+def on_press(key):
+    # loop = asyncio.get_event_loop()
+    # loop.run_until_complete(handle_key_press(key))
+    return asyncio.run(handle_key_press(key))
+
+
+def on_release(key):
+    # loop = asyncio.get_event_loop()
+    # loop.run_until_complete(handle_key_release(key))
+    return asyncio.run(handle_key_release(key))
 
 
 def super_click_thread():
