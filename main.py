@@ -2,6 +2,7 @@ import asyncio
 
 import sha
 from sha.points import *
+from config import *
 from time import sleep
 from threading import Thread
 
@@ -52,16 +53,16 @@ def handle_4_dishes():
     for p in [POS_DISH_1, POS_DISH_2, POS_DISH_3, POS_DISH_4]:
         if SUPER_CLICK:
             return
-        sha.click(p, 3)
+        sha.click(p, DISH_CLICK_COUNT)
         print(f'Dish {p} clicked')
-    sleep(.4)
+    sleep(.3)
     if SUPER_CLICK:
         return
     sha.swipe(POS_CAKE_BOTTOM, POS_CAKE_TOP, 0.2)
     if SUPER_CLICK:
         return
     print('Cake swiped')
-    sleep(.05)
+    sleep(.4)
     sha.click(POS_WRAPPING_MACHINE, 3, 0.08)
     if SUPER_CLICK:
         return
@@ -72,7 +73,7 @@ def handle_4_dishes():
 def handle_fry_potato():
     sha.swipe(POS_TABLE_LEFT, POS_TABLE_RIGHT, .2)
     sha.click(POS_POTATO_FRY, 2)
-    sha.click_hold(POS_POTATO, 3)
+    sha.click_hold(POS_POTATO, POTATO_CUT_TIME)
     print('Potato clicked')
     sha.move_to(POS_TABLE_CENTER)
 
@@ -89,14 +90,14 @@ async def handle_key_press(key):
             sha.print_mouse()
 
         elif key.char == 'a':
-            await sha.click(POS_BOSS, 2)
+            sha.click(POS_BOSS, 2)
             sha.move_to(POS_TABLE_CENTER)
 
         elif key.char == 'q':
             EXECUTOR.submit(handle_4_dishes)
 
         elif key.char == 'w':
-            await sha.click_async(POS_POTATO_FRY, 4)
+            sha.click(POS_POTATO_FRY, 4)
             print('Potato fry clicked')
             sha.move_to(POS_TABLE_CENTER)
 
