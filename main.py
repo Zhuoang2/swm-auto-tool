@@ -22,7 +22,6 @@ __doc__ = """
 
 按下 q 一键添加四个菜，卷饼，点机器打包。（需要解锁：自动刮肉，自动飞饼，一键打包）
 按下 w 点击炸薯条，一键把炸好的薯条放到桌子上
-按下 e 一键炸薯条，此操作会同时收钱+点薯条，防止小偷+防止锅内已有薯条无法炸
 按下 a 点击老板，备货（需要解锁：员工培训）
 
 按下 c 滑动桌子，自动收钱
@@ -49,33 +48,100 @@ def disable_super_click():
         SUPER_CLICK))
 
 
-def handle_4_dishes():
+def action_add_4_dish():
+    """
+    一键添加四个菜
+    :return:
+    """
+    # add dish
     for p in [POS_DISH_1, POS_DISH_2, POS_DISH_3, POS_DISH_4]:
         if SUPER_CLICK:
             return
         sha.click(p, DISH_CLICK_COUNT)
         print(f'Dish {p} clicked')
-    sleep(.3)
     if SUPER_CLICK:
         return
+
+
+def action_add_sauce():
+    """
+    添加石榴汁
+    :return:
+    """
+    sha.click(POS_SHILIU)
+    if SUPER_CLICK:
+        return
+    sleep(.1)
+    sha.swipe(POS_SHILIU, POS_CACE_CENTER, 0.4)
+    if SUPER_CLICK:
+        return
+    sleep(1)
+
+
+def action_roll_pancake():
+    """
+    卷饼
+    :return:
+    """
     sha.swipe(POS_CAKE_BOTTOM, POS_CAKE_TOP, 0.2)
+
+
+def action_wrap_pancake():
+    """
+    打包
+    :return:
+    """
+    sha.click(POS_WRAPPING_MACHINE, 3, 0.08)
+
+
+def action_fry_potato():
+    """
+    炸薯条
+    :return:
+    """
+    sha.swipe(POS_TABLE_LEFT, POS_TABLE_RIGHT, .2)
+    sha.click(POS_POTATO_FRY, 2)
+    sleep(.2)
+    sha.click(POS_POTATO)
+    sleep(.2)
+    sha.click_hold(POS_POTATO, POTATO_CUT_TIME)
+    print('Potato clicked')
+    sha.move_to(POS_TABLE_CENTER)
+
+
+def super_add_dish_sauec_pack():
+    """
+    一键添加四个菜，卷饼，点机器打包
+    :return:
+    """
+    action_add_4_dish()
+    if SUPER_CLICK:
+        return
+    sleep(.2)
+    # add sauce
+    action_add_sauce()
+    if SUPER_CLICK:
+        return
+    # roll the pancake
+    action_roll_pancake()
     if SUPER_CLICK:
         return
     print('Cake swiped')
     sleep(.4)
-    sha.click(POS_WRAPPING_MACHINE, 3, 0.08)
+    # wrap
+    action_wrap_pancake()
     if SUPER_CLICK:
         return
     print('Wrapping machine clicked')
     sha.move_to(POS_TABLE_CENTER)
 
 
-def handle_fry_potato():
-    sha.swipe(POS_TABLE_LEFT, POS_TABLE_RIGHT, .2)
-    sha.click(POS_POTATO_FRY, 2)
-    sha.click_hold(POS_POTATO, POTATO_CUT_TIME)
-    print('Potato clicked')
-    sha.move_to(POS_TABLE_CENTER)
+def super_fry_potato():
+    """
+    一键炸薯条，升级了自动切薯条的话，此函数不需要
+    :return:
+    """
+    action_fry_potato()
 
 
 def handle_swipte_table():
@@ -94,15 +160,15 @@ async def handle_key_press(key):
             sha.move_to(POS_TABLE_CENTER)
 
         elif key.char == 'q':
-            EXECUTOR.submit(handle_4_dishes)
+            EXECUTOR.submit(super_add_dish_sauec_pack)
 
         elif key.char == 'w':
             sha.click(POS_POTATO_FRY, 4)
             print('Potato fry clicked')
             sha.move_to(POS_TABLE_CENTER)
 
-        elif key.char == 'e':
-            EXECUTOR.submit(handle_fry_potato)
+        # elif key.char == 'e':
+        #     EXECUTOR.submit(super_fry_potato)
 
         elif key.char == 'c':
             EXECUTOR.submit(handle_swipte_table)

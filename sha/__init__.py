@@ -45,7 +45,7 @@ async def click_async(pos: tuple, cnt=1, sleep_time=0.04):
 
 
 def click(pos: tuple, cnt=1, sleep_time=0.04):
-    for _ in range(cnt):
+    for i in range(cnt):
         move_to(pos)
         win32api.mouse_event(
             win32con.MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0)
@@ -56,7 +56,7 @@ def click(pos: tuple, cnt=1, sleep_time=0.04):
         if FAILSAFE:
             print('** FAILSAFE **')
             break
-        if cnt > 1:
+        if cnt > 1 and i != cnt - 1:
             sleep(sleep_time)
 
 
@@ -86,6 +86,7 @@ async def swipe_async(pos1: tuple, pos2: tuple, duration=0.2):
 
 def swipe(pos1: tuple, pos2: tuple, duration=0.2):
     move_to(pos1)
+    sleep(.05)
     win32api.mouse_event(
         win32con.MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0)
     steps = 20
