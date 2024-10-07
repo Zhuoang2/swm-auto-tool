@@ -65,20 +65,28 @@ def action_add_4_dish():
         return
 
 
-def action_add_sauce():
+def action_add_sauce(is_swipe=False):
     """
     添加石榴汁
     :return:
     """
-    sha.click(POS_SHILIU)
-    if SUPER_CLICK:
-        return
-    sleep(.1)
-    sha.swipe(POS_SHILIU, POS_CACE_CENTER, 0.4)
-    print('左下角酱汁滑动完成')
-    if SUPER_CLICK:
-        return
-    sleep(1)
+    # just click first
+    sha.move_to(POS_SHILIU)
+    if is_swipe:
+        if SUPER_CLICK:
+            return
+        sha.click(POS_SHILIU, 1)
+        sleep(.1)
+        sha.swipe(POS_SHILIU, POS_CACE_CENTER, 0.4)
+        print('左下角酱汁滑动完成')
+        if SUPER_CLICK:
+            return
+        sleep(1)
+    else:
+        sleep(.05)
+        sha.click(POS_SHILIU, 2)
+        sleep(1)
+        print('左下角酱汁点击完成')
 
 
 def action_roll_pancake():
@@ -115,11 +123,12 @@ def action_fry_potato():
     sha.move_to(POS_TABLE_CENTER)
 
 
-def super_add_dish_sauec_pack():
+def super_add_dish_sauce_pack():
     """
     一键添加四个菜，卷饼，点机器打包
     :return:
     """
+    sha.click(POS_BOSS, 1)
     action_add_4_dish()
     if SUPER_CLICK:
         return
@@ -149,7 +158,7 @@ def super_fry_potato():
 
 
 def handle_swipte_table():
-    sha.swipe(POS_TABLE_LEFT, POS_TABLE_RIGHT, .2)
+    sha.swipe(POS_TABLE_LEFT, POS_TABLE_RIGHT, .4)
     print('滑动桌子完成')
     sha.move_to(POS_TABLE_CENTER)
 
@@ -167,7 +176,7 @@ async def handle_key_press(key):
             sha.move_to(POS_TABLE_CENTER)
 
         elif key.char == 'q':
-            EXECUTOR.submit(super_add_dish_sauec_pack)
+            EXECUTOR.submit(super_add_dish_sauce_pack)
 
         elif key.char == 'w':
             sha.click(POS_POTATO_FRY, 2)
