@@ -129,7 +129,7 @@ def click_hold(pos, seconds):
     win32api.mouse_event(
         win32con.MOUSEEVENTF_LEFTDOWN, 0, 0, 0)
 
-    for i in range(seconds * 10):
+    for i in range(int(seconds * 10)):
         sleep(0.1)
         if FAILSAFE:
             print('** FAILSAFE **')
