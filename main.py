@@ -1,4 +1,5 @@
 import asyncio
+import time
 
 import sha
 from sha.points import *
@@ -56,11 +57,12 @@ def action_add_4_dish():
     :return:
     """
     # add dish
+    print('[1] 一键添加四种酱料开始')
     for p in [POS_DISH_1, POS_DISH_2, POS_DISH_3, POS_DISH_4]:
         if SUPER_CLICK:
             return
         sha.click(p, DISH_CLICK_COUNT)
-        print(f'加料坐标 {p} 完成')
+        print(f'[1] 酱料位置 {p} 完成')
     if SUPER_CLICK:
         return
 
@@ -71,6 +73,7 @@ def action_add_sauce(is_swipe=False):
     :return:
     """
     # just click first
+    print('[2] 左下角酱汁开始')
     sha.move_to(POS_SHILIU)
     if is_swipe:
         if SUPER_CLICK:
@@ -78,15 +81,15 @@ def action_add_sauce(is_swipe=False):
         sha.click(POS_SHILIU, 1)
         sleep(.1)
         sha.swipe(POS_SHILIU, POS_CACE_CENTER, 0.4)
-        print('左下角酱汁滑动完成')
+        print('[2] 左下角酱汁滑动完成')
         if SUPER_CLICK:
             return
-        sleep(1)
+        # sleep(1)
     else:
         sleep(.05)
         sha.click(POS_SHILIU, 2)
-        sleep(1)
-        print('左下角酱汁点击完成')
+        # sleep(1)
+        print('[2] 左下角酱汁点击完成')
 
 
 def action_roll_pancake():
@@ -95,7 +98,7 @@ def action_roll_pancake():
     :return:
     """
     sha.swipe(POS_CAKE_BOTTOM, POS_CAKE_TOP, 0.2)
-    print('卷饼操作完成')
+    print('[-] 卷饼操作完成')
 
 
 def action_wrap_pancake():
@@ -104,7 +107,7 @@ def action_wrap_pancake():
     :return:
     """
     sha.click(POS_WRAPPING_MACHINE, 3, 0.08)
-    print('打包操作完成')
+    print('[-] 打包操作完成')
 
 
 def action_fry_potato():
@@ -113,14 +116,25 @@ def action_fry_potato():
     :return:
     """
     sha.swipe(POS_TABLE_LEFT, POS_TABLE_RIGHT, .2)
-    print('炸土豆前战术性收钱已完成')
-    sha.click(POS_POTATO_FRY, 2)
+    print('[5] 炸土豆前战术性收钱已完成')
+    action_click_potato_pot(2)
     sleep(.2)
     sha.click(POS_POTATO)
     sleep(.2)
-    print(f'开始切土豆，需要切：{int(POTATO_CUT_TIME * 10) * 0.1} 秒')
+    print(f'[5] 开始切土豆，需要切：{int(POTATO_CUT_TIME * 10) * 0.1} 秒')
     sha.click_hold(POS_POTATO, POTATO_CUT_TIME)
     sha.move_to(POS_TABLE_CENTER)
+    print('[5] 土豆切割+炸土豆完成')
+
+
+def action_click_potato_pot(cnt=1):
+    sha.click(POS_POTATO_FRY, cnt)
+    print(f'[-] 点击炸好的土豆 {cnt} 次')
+
+
+def action_boss_add_atock():
+    sha.click(POS_BOSS, 1)
+    print('[-] 老板备货完成')
 
 
 def super_add_dish_sauce_pack():
@@ -128,25 +142,35 @@ def super_add_dish_sauce_pack():
     一键添加四个菜，卷饼，点机器打包
     :return:
     """
-    sha.click(POS_BOSS, 1)
-    action_add_4_dish()
-    if SUPER_CLICK:
-        return
-    sleep(.2)
+    print('=' * 20)
+    print('一键添加四个菜，卷饼，加酱料，点机器打包')
+    t1 = time.time()
+    # click potato
+    action_click_potato_pot()
     # add sauce
     action_add_sauce()
     if SUPER_CLICK:
         return
+    # add stock
+    action_boss_add_atock()
+    # add 4 dish
+    action_add_4_dish()
+    if SUPER_CLICK:
+        return
+    sleep(.2)
     # roll the pancake
     action_roll_pancake()
     if SUPER_CLICK:
         return
-    sleep(.4)
+    # while waiting for pancake, we clean the table
+    handle_swipte_table()
     # wrap
     action_wrap_pancake()
     if SUPER_CLICK:
         return
     sha.move_to(POS_TABLE_CENTER)
+    print('-' * 20)
+    print(f'耗时 {time.time() - t1:.2f} 秒')
 
 
 def super_fry_potato():
@@ -158,8 +182,9 @@ def super_fry_potato():
 
 
 def handle_swipte_table():
+    print('[6] 开始滑动桌子收钱')
     sha.swipe(POS_TABLE_LEFT, POS_TABLE_RIGHT, .4)
-    print('滑动桌子完成')
+    print('[6] 滑动桌子收钱完成')
     sha.move_to(POS_TABLE_CENTER)
 
 
@@ -179,7 +204,7 @@ async def handle_key_press(key):
             EXECUTOR.submit(super_add_dish_sauce_pack)
 
         elif key.char == 'w':
-            sha.click(POS_POTATO_FRY, 2)
+            action_click_potato_pot(2)
             print('点击土豆')
             sha.move_to(POS_TABLE_CENTER)
 
