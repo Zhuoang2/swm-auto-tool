@@ -91,7 +91,7 @@ def swipe(pos1: Tuple[int, int], pos2: Tuple[int, int], duration=0.2) -> None:
     sleep(.05)
     win32api.mouse_event(
         win32con.MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0)
-    steps = 20
+    steps = 30
     x1 = pos1[0]
     x2 = pos2[0]
     y1 = pos1[1]
@@ -107,6 +107,7 @@ def swipe(pos1: Tuple[int, int], pos2: Tuple[int, int], duration=0.2) -> None:
         if FAILSAFE:
             print('** FAILSAFE **')
             break
+    sleep(.05)
     win32api.mouse_event(
         win32con.MOUSEEVENTF_LEFTUP, 0, 0, 0, 0)
 

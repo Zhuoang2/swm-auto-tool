@@ -1,5 +1,6 @@
 import asyncio
 import time
+from typing import Tuple
 
 import sha
 from sha.points import *
@@ -188,6 +189,25 @@ def handle_swipte_table():
     sha.move_to(POS_TABLE_CENTER)
 
 
+def __feed_guest(guest_pos: Tuple[int, int]) -> None:
+    print(f'[7] 喂食客人 {guest_pos}')
+    sha.swipe(POS_DRINK, guest_pos, .1)
+    sha.swipe(POS_DRINK, guest_pos, .1)
+    if SUPER_CLICK:
+        return
+    sha.swipe(POS_DIGUA, guest_pos, .1)
+    sha.swipe(POS_DIGUA, guest_pos, .1)
+    if SUPER_CLICK:
+        return
+    sha.swipe(POS_TABLE_CENTER, guest_pos, .1)
+    sha.swipe(POS_TABLE_CENTER, guest_pos, .1)
+    print(f'[7] 客人 {guest_pos} 喂食完成')
+
+
+def feed_guest(guest_pos: Tuple[int, int]) -> None:
+    Thread(target=__feed_guest, args=(guest_pos,), daemon=True).start()
+
+
 async def handle_key_press(key):
     if key in {keyboard.Key.esc, keyboard.Key.alt, keyboard.Key.cmd}:
         # Stop listener
@@ -221,6 +241,12 @@ async def handle_key_press(key):
             sha.move_to(POS_DRINK)
         elif key.char == 'x':
             sha.move_to(POS_DIGUA)
+        elif key.char == '1':
+            feed_guest(POS_GUEST_1)
+        elif key.char == '2':
+            feed_guest(POS_GUEST_2)
+        elif key.char == '3':
+            feed_guest(POS_GUEST_3)
 
     except AttributeError:
         if key == keyboard.Key.tab:
