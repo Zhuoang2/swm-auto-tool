@@ -88,10 +88,10 @@ async def swipe_async(pos1: Tuple[int, int], pos2: Tuple[int, int], duration=0.2
 
 def swipe(pos1: Tuple[int, int], pos2: Tuple[int, int], duration=0.2) -> None:
     move_to(pos1)
-    sleep(.05)
+    sleep(.08)
     win32api.mouse_event(
         win32con.MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0)
-    steps = 30
+    steps = 50
     x1 = pos1[0]
     x2 = pos2[0]
     y1 = pos1[1]

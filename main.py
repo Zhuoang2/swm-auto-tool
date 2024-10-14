@@ -138,6 +138,12 @@ def action_boss_add_atock():
     print('[-] 老板备货完成')
 
 
+def action_click_coca_machine():
+    sha.click(POS_COCA_1, 1)
+    sha.click(POS_COCA_2, 1)
+    print('[-] 可乐机点击完成')
+
+
 def super_add_dish_sauce_pack():
     """
     一键添加四个菜，卷饼，点机器打包
@@ -146,8 +152,6 @@ def super_add_dish_sauce_pack():
     print('=' * 20)
     print('一键添加四个菜，卷饼，加酱料，点机器打包')
     t1 = time.time()
-    # click potato
-    action_click_potato_pot()
     # add sauce
     action_add_sauce()
     if SUPER_CLICK:
@@ -158,15 +162,19 @@ def super_add_dish_sauce_pack():
     action_add_4_dish()
     if SUPER_CLICK:
         return
-    sleep(.2)
+    #sleep(.2)
+    # click potato
+    action_click_potato_pot()
+    # click coca machine
+    action_click_coca_machine()
     # roll the pancake
     action_roll_pancake()
     if SUPER_CLICK:
         return
     # while waiting for pancake, we clean the table
-    handle_swipte_table()
+    # handle_swipte_table()
     # wrap
-    action_wrap_pancake()
+    # action_wrap_pancake()
     if SUPER_CLICK:
         return
     sha.move_to(POS_TABLE_CENTER)
@@ -191,16 +199,30 @@ def handle_swipte_table():
 
 def __feed_guest(guest_pos: Tuple[int, int]) -> None:
     print(f'[7] 喂食客人 {guest_pos}')
-    sha.swipe(POS_DRINK, guest_pos, .1)
-    sha.swipe(POS_DRINK, guest_pos, .1)
+    sha.swipe(POS_DRINK, guest_pos, .15)
+    sleep(.1)
+    sha.swipe(POS_DRINK, guest_pos, .15)
+    print(f'[7] 盒装饮料 {guest_pos}')
     if SUPER_CLICK:
         return
-    sha.swipe(POS_DIGUA, guest_pos, .1)
-    sha.swipe(POS_DIGUA, guest_pos, .1)
+    sha.swipe(POS_DIGUA, guest_pos, .12)
+    sha.swipe(POS_DIGUA, guest_pos, .12)
+    print(f'[7] 地瓜 {guest_pos}')
     if SUPER_CLICK:
         return
     sha.swipe(POS_TABLE_CENTER, guest_pos, .1)
     sha.swipe(POS_TABLE_CENTER, guest_pos, .1)
+    print(f'[7] 卷饼 {guest_pos}')
+    if SUPER_CLICK:
+        return
+    sha.swipe(POS_COCA_CUP_1, guest_pos, .14)
+    sleep(0.2)
+    sha.swipe(POS_COCA_CUP_2, guest_pos, .14)
+    print(f'[7] 可乐 {guest_pos}')
+    action_click_coca_machine()
+    for i in (POS_FRY_1,POS_FRY_2,):
+        sha.swipe(i, guest_pos, .15)
+    print(f'[7] 薯条 {guest_pos}')
     print(f'[7] 客人 {guest_pos} 喂食完成')
 
 
@@ -224,8 +246,10 @@ async def handle_key_press(key):
             EXECUTOR.submit(super_add_dish_sauce_pack)
 
         elif key.char == 'w':
+            # waiting for package fly to table
+            # do other stuff
+            action_click_coca_machine()
             action_click_potato_pot(2)
-            print('点击土豆')
             sha.move_to(POS_TABLE_CENTER)
 
         # elif key.char == 'e':
@@ -247,6 +271,8 @@ async def handle_key_press(key):
             feed_guest(POS_GUEST_2)
         elif key.char == '3':
             feed_guest(POS_GUEST_3)
+        elif key.char == '4':
+            feed_guest(POS_GUEST_4)
 
     except AttributeError:
         if key == keyboard.Key.tab:
