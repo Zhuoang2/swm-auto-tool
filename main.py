@@ -81,7 +81,7 @@ def action_add_sauce(is_swipe=False):
             return
         sha.click(POS_SHILIU, 1)
         sleep(.1)
-        sha.swipe(POS_SHILIU, POS_CACE_CENTER, 0.4)
+        sha.swipe(POS_SHILIU, POS_CACE_CENTER)
         print('[2] 左下角酱汁滑动完成')
         if SUPER_CLICK:
             return
@@ -98,7 +98,7 @@ def action_roll_pancake():
     卷饼
     :return:
     """
-    sha.swipe(POS_CAKE_BOTTOM, POS_CAKE_TOP, 0.2)
+    sha.swipe(POS_CAKE_BOTTOM, POS_CAKE_TOP)
     print('[-] 卷饼操作完成')
 
 
@@ -116,7 +116,7 @@ def action_fry_potato():
     炸薯条
     :return:
     """
-    sha.swipe(POS_TABLE_LEFT, POS_TABLE_RIGHT, .2)
+    sha.swipe(POS_TABLE_LEFT, POS_TABLE_RIGHT)
     print('[5] 炸土豆前战术性收钱已完成')
     action_click_potato_pot(2)
     sleep(.2)
@@ -156,17 +156,19 @@ def super_add_dish_sauce_pack():
     action_add_sauce()
     if SUPER_CLICK:
         return
-    # add stock
-    action_boss_add_atock()
     # add 4 dish
     action_add_4_dish()
     if SUPER_CLICK:
         return
     #sleep(.2)
+    # after click 4 dish, there's a small time gap
+    # add stock
+    action_boss_add_atock()
     # click potato
     action_click_potato_pot()
     # click coca machine
     action_click_coca_machine()
+    sleep(.4)
     # roll the pancake
     action_roll_pancake()
     if SUPER_CLICK:
@@ -192,36 +194,36 @@ def super_fry_potato():
 
 def handle_swipte_table():
     print('[6] 开始滑动桌子收钱')
-    sha.swipe(POS_TABLE_LEFT, POS_TABLE_RIGHT, .4)
+    sha.swipe(POS_TABLE_LEFT, POS_TABLE_RIGHT)
     print('[6] 滑动桌子收钱完成')
     sha.move_to(POS_TABLE_CENTER)
 
 
 def __feed_guest(guest_pos: Tuple[int, int]) -> None:
     print(f'[7] 喂食客人 {guest_pos}')
-    sha.swipe(POS_DRINK, guest_pos, .15)
+    sha.swipe(POS_DRINK, guest_pos)
     sleep(.1)
-    sha.swipe(POS_DRINK, guest_pos, .15)
+    sha.swipe(POS_DRINK, guest_pos)
     print(f'[7] 盒装饮料 {guest_pos}')
     if SUPER_CLICK:
         return
-    sha.swipe(POS_DIGUA, guest_pos, .12)
-    sha.swipe(POS_DIGUA, guest_pos, .12)
+    sha.swipe(POS_DIGUA, guest_pos)
+    sha.swipe(POS_DIGUA, guest_pos)
     print(f'[7] 地瓜 {guest_pos}')
     if SUPER_CLICK:
         return
-    sha.swipe(POS_TABLE_CENTER, guest_pos, .1)
-    sha.swipe(POS_TABLE_CENTER, guest_pos, .1)
+    sha.swipe(POS_TABLE_CENTER, guest_pos)
+    sha.swipe(POS_TABLE_CENTER, guest_pos)
     print(f'[7] 卷饼 {guest_pos}')
     if SUPER_CLICK:
         return
-    sha.swipe(POS_COCA_CUP_1, guest_pos, .14)
+    sha.swipe(POS_COCA_CUP_1, guest_pos)
     sleep(0.2)
-    sha.swipe(POS_COCA_CUP_2, guest_pos, .14)
+    sha.swipe(POS_COCA_CUP_2, guest_pos)
     print(f'[7] 可乐 {guest_pos}')
     action_click_coca_machine()
     for i in (POS_FRY_1,POS_FRY_2,):
-        sha.swipe(i, guest_pos, .15)
+        sha.swipe(i, guest_pos)
     print(f'[7] 薯条 {guest_pos}')
     print(f'[7] 客人 {guest_pos} 喂食完成')
 
