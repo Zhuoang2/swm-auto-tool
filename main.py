@@ -201,7 +201,17 @@ def handle_swipte_table():
 
 def __feed_guest(guest_pos: Tuple[int, int]) -> None:
     t1 = time.time()
-    print(f'[7] 喂食客人 {guest_pos}')
+    sha.swipe(POS_COCA_CUP_1, guest_pos, sha.DRAG_MODE_TELEPORT)
+    sha.swipe(POS_COCA_CUP_2, guest_pos, sha.DRAG_MODE_TELEPORT)
+    if SUPER_CLICK:
+        return
+    print(f'[7] 可乐 {guest_pos} (1/2)')
+    sha.swipe(POS_TABLE_CENTER, guest_pos, sha.DRAG_MODE_TELEPORT)
+    sleep(.05)
+    sha.swipe(POS_TABLE_CENTER_LOWER, guest_pos, sha.DRAG_MODE_TELEPORT)
+    print(f'[7] 卷饼 {guest_pos} (1/2)')
+    if SUPER_CLICK:
+        return
     sha.swipe(POS_DRINK, guest_pos, sha.DRAG_MODE_TELEPORT)
     sha.swipe(POS_DRINK, guest_pos, sha.DRAG_MODE_TELEPORT)
     print(f'[7] 盒装饮料 {guest_pos}')
@@ -212,19 +222,17 @@ def __feed_guest(guest_pos: Tuple[int, int]) -> None:
     print(f'[7] 地瓜 {guest_pos}')
     if SUPER_CLICK:
         return
-    sha.swipe(POS_TABLE_CENTER, guest_pos, sha.DRAG_MODE_TELEPORT)
-    sha.swipe(POS_TABLE_CENTER, guest_pos, sha.DRAG_MODE_TELEPORT)
-    print(f'[7] 卷饼 {guest_pos}')
-    if SUPER_CLICK:
-        return
-    sha.swipe(POS_COCA_CUP_1, guest_pos, sha.DRAG_MODE_TELEPORT)
-    # sleep(0.2)
-    sha.swipe(POS_COCA_CUP_2, guest_pos, sha.DRAG_MODE_TELEPORT)
-    print(f'[7] 可乐 {guest_pos}')
     action_click_coca_machine()
     for i in (POS_FRY_1,POS_FRY_2,):
         sha.swipe(i, guest_pos, sha.DRAG_MODE_TELEPORT)
     print(f'[7] 薯条 {guest_pos}')
+    sha.swipe(POS_TABLE_CENTER_UPPER, guest_pos, sha.DRAG_MODE_TELEPORT)
+    print(f'[7] 卷饼 {guest_pos} (2/2)')
+    if SUPER_CLICK:
+        return
+    sha.swipe(POS_COCA_CUP_1, guest_pos, sha.DRAG_MODE_TELEPORT)
+    sha.swipe(POS_COCA_CUP_2, guest_pos, sha.DRAG_MODE_TELEPORT)
+    print(f'[7] 可乐 {guest_pos} (2/2)')
     t2 = time.time()
     print(f'[7] 客人 {guest_pos} 喂食完成，耗时 {t2-t1:.2f} 秒')
 
