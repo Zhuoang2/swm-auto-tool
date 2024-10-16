@@ -13,6 +13,10 @@ import asyncio
 mouse = Controller()
 FAILSAFE = False
 
+DRAG_MODE_TELEPORT = 100
+DRAG_MODE_FAST = 101
+DRAG_MODE_SLOW = 102
+
 
 def mouse_up() -> None:
     win32api.mouse_event(
@@ -87,17 +91,30 @@ async def swipe_async(pos1: Tuple[int, int], pos2: Tuple[int, int], duration=0.2
         win32con.MOUSEEVENTF_LEFTUP, 0, 0, 0, 0)
 
 
-def swipe(pos1: Tuple[int, int], pos2: Tuple[int, int]) -> None:
+def swipe(pos1: Tuple[int, int], pos2: Tuple[int, int], drag_mode: int = DRAG_MODE_FAST) -> None:
     move_to(pos1)
-    sleep(.08)
+    click(pos1, 1)
     win32api.mouse_event(
         win32con.MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0)
+    sleep(.1)
+    if drag_mode == DRAG_MODE_TELEPORT:
+        move_to(pos2)
+        sleep(.08)
+        win32api.mouse_event(
+            win32con.MOUSEEVENTF_LEFTUP, 0, 0, 0, 0)
+        return
     x1 = pos1[0]
     y1 = pos1[1]
     x2 = pos2[0]
     y2 = pos2[1]
     distance = int(math.sqrt((y2 - y1)**2 + (x2 - x1)**2))
-    steps = distance // 10
+    steps = distance // 50
+    if steps == 0:
+        move_to(pos2)
+        sleep(.05)
+        win32api.mouse_event(
+            win32con.MOUSEEVENTF_LEFTUP, 0, 0, 0, 0)
+        return
     for i in range(steps):
         if FAILSAFE:
             print('** FAILSAFE **')
@@ -105,10 +122,18 @@ def swipe(pos1: Tuple[int, int], pos2: Tuple[int, int]) -> None:
         p = (int(x1 + (x2 - x1) * i / steps),
              int(y1 + (y2 - y1) * i / steps))
         move_to(p)
-        sleep(.0025)
+        if drag_mode==DRAG_MODE_SLOW:
+            sleep(0.03)
+        else:
+            # first part
+            if steps < 3:
+                sleep(0.007)
+            else:
+                sleep(0.003)
         if FAILSAFE:
             print('** FAILSAFE **')
             break
+    move_to(pos2)
     sleep(.05)
     win32api.mouse_event(
         win32con.MOUSEEVENTF_LEFTUP, 0, 0, 0, 0)
