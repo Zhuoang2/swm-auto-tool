@@ -3,4 +3,5 @@
 *.py[coid]
 
 img/PixPin*
+img/capture*
 test/
