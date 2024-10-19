@@ -3,6 +3,7 @@ import time
 from typing import Tuple
 
 import sha
+import sha.cv as cv
 from sha.points import *
 from config import *
 from time import sleep
@@ -160,7 +161,7 @@ def super_add_dish_sauce_pack():
     action_add_4_dish()
     if SUPER_CLICK:
         return
-    #sleep(.2)
+    # sleep(.2)
     # after click 4 dish, there's a small time gap
     # add stock
     action_boss_add_atock()
@@ -199,46 +200,174 @@ def handle_swipte_table():
     sha.move_to(POS_TABLE_CENTER)
 
 
+def __feed_cola_1(guest_pos: Tuple[int, int]) -> None:
+    sha.swipe(POS_COCA_CUP_1, guest_pos, sha.DRAG_MODE_TELEPORT)
+
+
+def __feed_cola_2(guest_pos: Tuple[int, int]) -> None:
+    sha.swipe(POS_COCA_CUP_2, guest_pos, sha.DRAG_MODE_TELEPORT)
+
+
+def __feed_swm(guest_pos: Tuple[int, int], count=3) -> None:
+    pos = [POS_TABLE_CENTER_UPPER, POS_TABLE_CENTER_LOWER, POS_TABLE_CENTER]
+    for i in range(count):
+        sha.swipe(pos[i], guest_pos, sha.DRAG_MODE_TELEPORT)
+        if count > 1 and i != count - 1:
+            sleep(0.05)
+
+
+def __feed_swm_image_recognition(guest_pos: Tuple[int, int], count=3) -> None:
+    # first get all coords of all swm
+    print(f'沙威玛：', end='')
+    img = cv.fast_screen_shot(POS_TABLE_LT, POS_TABLE_RB)
+    cv.to_show_image.put((cv.WINDOW_NAME_TABLE, img))
+    res = cv.match_many_object_on_image(img, cv.img_swm_h, draw_rect=True, output_name='swm_h.png')
+    # shift the coords. res' coords are relative to POS_TABLE_LT
+    res = [(x + POS_TABLE_LT[0], y + POS_TABLE_LT[1]) for x, y in res]
+    print(f'桌子上有 {len(res)} 个，需要 {count} 个，满足条件：{len(res) >= count}')
+    # feed the least swm
+    for i in range(min(count, len(res))):
+        sha.swipe(res[i], guest_pos, sha.DRAG_MODE_TELEPORT)
+        sleep(.05)
+
+
+def __feed_drink(guest_pos: Tuple[int, int], count=1) -> None:
+    for i in range(count):
+        sha.swipe(POS_DRINK, guest_pos, sha.DRAG_MODE_TELEPORT)
+
+
+def __feed_digua(guest_pos: Tuple[int, int], count=1) -> None:
+    # sha.swipe(POS_DIGUA, guest_pos, sha.DRAG_MODE_TELEPORT)
+    for i in range(count):
+        sha.swipe(POS_DIGUA, guest_pos, sha.DRAG_MODE_TELEPORT)
+
+
+def __feed_shutiao(guest_pos: Tuple[int, int], count=3) -> None:
+    shutiao = [POS_FRY_1, POS_FRY_2, POS_FRY_3]
+    for i in range(count):
+        sha.swipe(shutiao[i], guest_pos, sha.DRAG_MODE_TELEPORT)
+
+
+def __feed_shutiao_image_recognition(guest_pos: Tuple[int, int], count=3) -> None:
+    # first get all coords of all shutiao
+    print(f'桌子上：', end='')
+    img = cv.fast_screen_shot(POS_FRY_LT, POS_FRY_RB)
+    res = cv.match_many_object_on_image(img, cv.img_shutiao_l, draw_rect=True, output_name='shutiao.png')
+    cv.to_show_image.put((cv.WINDOW_NAME_FRY, img))
+    # shift the coords. res' coords are relative to POS_FRY_LT
+    res = [(x + POS_FRY_LT[0], y + POS_FRY_LT[1]) for x, y in res]
+    print(f'有 {len(res)} 个薯条，需要 {count} 个，满足条件：{len(res) >= count}')
+    # feed the least shutiao
+    for i in range(min(count, len(res))):
+        sha.swipe(res[i], guest_pos, sha.DRAG_MODE_TELEPORT)
+        sleep(.1)
+
+
 def __feed_guest(guest_pos: Tuple[int, int]) -> None:
     t1 = time.time()
-    sha.swipe(POS_COCA_CUP_1, guest_pos, sha.DRAG_MODE_TELEPORT)
-    sha.swipe(POS_COCA_CUP_2, guest_pos, sha.DRAG_MODE_TELEPORT)
+    __feed_cola_1(guest_pos)
+    __feed_cola_2(guest_pos)
     if SUPER_CLICK:
         return
     print(f'[7] 可乐 {guest_pos} (1/2)')
-    sha.swipe(POS_TABLE_CENTER, guest_pos, sha.DRAG_MODE_TELEPORT)
-    sleep(.05)
-    sha.swipe(POS_TABLE_CENTER_LOWER, guest_pos, sha.DRAG_MODE_TELEPORT)
-    print(f'[7] 卷饼 {guest_pos} (1/2)')
+    __feed_swm(guest_pos)
+    print(f'[7] 卷饼 {guest_pos} (1)')
     if SUPER_CLICK:
         return
-    sha.swipe(POS_DRINK, guest_pos, sha.DRAG_MODE_TELEPORT)
-    sha.swipe(POS_DRINK, guest_pos, sha.DRAG_MODE_TELEPORT)
+    __feed_drink(guest_pos)
+    __feed_drink(guest_pos)
     print(f'[7] 盒装饮料 {guest_pos}')
     if SUPER_CLICK:
         return
-    sha.swipe(POS_DIGUA, guest_pos, sha.DRAG_MODE_TELEPORT)
-    sha.swipe(POS_DIGUA, guest_pos, sha.DRAG_MODE_TELEPORT)
+    __feed_digua(guest_pos)
+    __feed_digua(guest_pos)
     print(f'[7] 地瓜 {guest_pos}')
     if SUPER_CLICK:
         return
     action_click_coca_machine()
-    for i in (POS_FRY_1,POS_FRY_2,):
-        sha.swipe(i, guest_pos, sha.DRAG_MODE_TELEPORT)
+    __feed_shutiao(guest_pos, 2)
     print(f'[7] 薯条 {guest_pos}')
-    sha.swipe(POS_TABLE_CENTER_UPPER, guest_pos, sha.DRAG_MODE_TELEPORT)
-    print(f'[7] 卷饼 {guest_pos} (2/2)')
     if SUPER_CLICK:
         return
-    sha.swipe(POS_COCA_CUP_1, guest_pos, sha.DRAG_MODE_TELEPORT)
-    sha.swipe(POS_COCA_CUP_2, guest_pos, sha.DRAG_MODE_TELEPORT)
+    __feed_cola_1(guest_pos)
+    __feed_cola_2(guest_pos)
     print(f'[7] 可乐 {guest_pos} (2/2)')
     t2 = time.time()
-    print(f'[7] 客人 {guest_pos} 喂食完成，耗时 {t2-t1:.2f} 秒')
+    print(f'[7] 客人 {guest_pos} 喂食完成，耗时 {t2 - t1:.2f} 秒')
+
+
+def __feed_guest_image_recognition(guest_index: int) -> None:
+    print(f'=' * 20)
+    print(f'开始识别 {guest_index} 的需求')
+    pos_lt = None
+    pos_rb = None
+    pos_g = None
+    if guest_index == 1:
+        pos_lt = POS_GUEST_1_LT
+        pos_rb = POS_GUEST_1_RB
+        pos_g = POS_GUEST_1
+    elif guest_index == 2:
+        pos_lt = POS_GUEST_2_LT
+        pos_rb = POS_GUEST_2_RB
+        pos_g = POS_GUEST_2
+    elif guest_index == 3:
+        pos_lt = POS_GUEST_3_LT
+        pos_rb = POS_GUEST_3_RB
+        pos_g = POS_GUEST_3
+    elif guest_index == 4:
+        pos_lt = POS_GUEST_4_LT
+        pos_rb = POS_GUEST_4_RB
+        pos_g = POS_GUEST_4
+    if pos_lt is None or pos_rb is None:
+        print('无效的客人索引！')
+        print(f'-' * 20)
+        return
+    img = cv.fast_screen_shot(pos_lt, pos_rb)
+    # generate item list
+    item_list = {}
+    for item, name in [
+        (cv.img_swm, 'swm'),
+        (cv.img_box, 'box'),
+        (cv.img_cola_b, 'cola_b'),
+        (cv.img_cola_o, 'cola_o'),
+        (cv.img_digua, 'digua'),
+        (cv.img_shutiao, 'shutiao'),
+    ]:
+        res = cv.match_many_object_on_image(img, item, draw_rect=True)
+        item_list[name] = len(res)
+    # show window
+    cv.to_show_image.put((cv.WINDOW_NAME_GUEST, img))
+    print(f'客人 {guest_index} 的物品列表：{item_list}')
+    # if cola is larger than 1, we first feed cola
+    if item_list['cola_b'] > 0:
+        __feed_cola_2(pos_g)
+    if item_list['cola_o'] > 0:
+        __feed_cola_1(pos_g)
+    # feed other items
+    if item_list['swm'] > 0:
+        __feed_swm_image_recognition(pos_g, item_list['swm'])
+    if item_list['box'] > 0:
+        __feed_drink(pos_g, item_list['box'])
+    if item_list['digua'] > 0:
+        __feed_digua(pos_g, item_list['digua'])
+    if item_list['shutiao'] > 0:
+        __feed_shutiao_image_recognition(pos_g, item_list['shutiao'])
+    # feed the rest cola
+    if item_list['cola_b'] > 1:
+        sleep(1)
+        __feed_cola_2(pos_g)
+    if item_list['cola_o'] > 1:
+        sleep(1)
+        __feed_cola_1(pos_g)
+    sha.move_to(POS_TABLE_CENTER)
 
 
 def feed_guest(guest_pos: Tuple[int, int]) -> None:
     Thread(target=__feed_guest, args=(guest_pos,), daemon=True).start()
+
+
+def feed_guest_image_recognition(guest_index: int) -> None:
+    Thread(target=__feed_guest_image_recognition, args=(guest_index,), daemon=True).start()
 
 
 async def handle_key_press(key):
@@ -277,13 +406,17 @@ async def handle_key_press(key):
         elif key.char == 'x':
             sha.move_to(POS_DIGUA)
         elif key.char == '1':
-            feed_guest(POS_GUEST_1)
+            # feed_guest(POS_GUEST_1)
+            feed_guest_image_recognition(1)
         elif key.char == '2':
-            feed_guest(POS_GUEST_2)
+            # feed_guest(POS_GUEST_2)
+            feed_guest_image_recognition(2)
         elif key.char == '3':
-            feed_guest(POS_GUEST_3)
+            # feed_guest(POS_GUEST_3)
+            feed_guest_image_recognition(3)
         elif key.char == '4':
-            feed_guest(POS_GUEST_4)
+            # feed_guest(POS_GUEST_4)
+            feed_guest_image_recognition(4)
 
     except AttributeError:
         if key == keyboard.Key.tab:
@@ -326,7 +459,7 @@ def super_click_thread():
 if __name__ == '__main__':
     # Start super click thread
     Thread(target=super_click_thread, daemon=True).start()
-
+    cv.init_show_windows()
     print('按下 ESC 退出')
     print(__doc__)
     # Collect events until released
