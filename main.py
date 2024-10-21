@@ -12,31 +12,30 @@ from threading import Thread
 from pynput import keyboard
 from concurrent.futures import ThreadPoolExecutor
 
+from rich import print
+
 SUPER_CLICK = False
 EXECUTOR = ThreadPoolExecutor(max_workers=1)
 
 __doc__ = """
-沙威玛传奇辅助工具
+[bold yellow]按下 ESC 键即退出，防止在其他程序内启用脚本。[/]
 
-按下 ESC，Alt，Windows 中的任何键即退出，防止在其他程序内启用脚本。
-
-按下 p 打印鼠标位置
+按下 p 打印鼠标位置，同时会复制坐标方便粘贴
 
 按下 TAB 或者 d 开启连点，松开关闭。
-无论在进行哪一项操作，只要激活连点，就会中断当前的脚本操作，立即切换鼠标连点（方便点小偷）
+只要激活连点，就会中断当前的脚本操作，立即切换鼠标连点（方便点小偷）
 
 按下 q 一键添加四个菜，卷饼，加酱料，点机器打包。（需要解锁：自动刮肉，自动飞饼，一键打包）
-按下 w 点击炸薯条，一键把炸好的薯条放到桌子上
+按下 w 点击炸薯条，一键把炸好的薯条放到桌子上（不是切土豆）
 按下 a 点击老板，备货（需要解锁：员工培训）
 
-按下 c 滑动桌子，自动收钱
-按下 z 移动到饮料，方便拿
-按下 x 移动到地瓜，方便拿
+1、2、3、4（非小键盘）可以识别客人需求，自动喂食
 
 """
 
 
 def enable_super_click():
+    """ 开启连点 """
     global SUPER_CLICK
     sha.FAILSAFE = True
     sha.mouse_up()
@@ -46,6 +45,7 @@ def enable_super_click():
 
 
 def disable_super_click():
+    """ 关闭连点 """
     global SUPER_CLICK
     SUPER_CLICK = False
     sha.FAILSAFE = False
@@ -182,7 +182,7 @@ def super_add_dish_sauce_pack():
         return
     sha.move_to(POS_TABLE_CENTER)
     print('-' * 20)
-    print(f'耗时 {time.time() - t1:.2f} 秒')
+    print(f'制作一个沙威玛耗时 {(time.time() - t1)*1000:.2f} 毫秒\n')
 
 
 def super_fry_potato():
@@ -209,6 +209,12 @@ def __feed_cola_2(guest_pos: Tuple[int, int]) -> None:
 
 
 def __feed_swm(guest_pos: Tuple[int, int], count=3) -> None:
+    """
+    喂食沙威玛，不包括图像识别
+    :param guest_pos:  客人位置
+    :param count:  需要喂食的数量
+    :return:
+    """
     pos = [POS_TABLE_CENTER_UPPER, POS_TABLE_CENTER_LOWER, POS_TABLE_CENTER]
     for i in range(count):
         sha.swipe(pos[i], guest_pos, sha.DRAG_MODE_TELEPORT)
@@ -217,6 +223,12 @@ def __feed_swm(guest_pos: Tuple[int, int], count=3) -> None:
 
 
 def __feed_swm_image_recognition(guest_pos: Tuple[int, int], count=3) -> None:
+    """
+    通过图像识别喂食沙威玛
+    :param guest_pos:  客人位置
+    :param count:  需要喂食的数量
+    :return:
+    """
     # first get all coords of all swm
     print(f'沙威玛：', end='')
     img = cv.fast_screen_shot(POS_TABLE_LT, POS_TABLE_RB)
@@ -299,6 +311,8 @@ def __feed_guest(guest_pos: Tuple[int, int]) -> None:
 def __feed_guest_image_recognition(guest_index: int) -> None:
     print(f'=' * 20)
     print(f'开始识别 {guest_index} 的需求')
+    t1 = time.time()
+    # find the guest position
     pos_lt = None
     pos_rb = None
     pos_g = None
@@ -318,11 +332,13 @@ def __feed_guest_image_recognition(guest_index: int) -> None:
         pos_lt = POS_GUEST_4_LT
         pos_rb = POS_GUEST_4_RB
         pos_g = POS_GUEST_4
-    if pos_lt is None or pos_rb is None:
+    if pos_lt is None or pos_rb is None or pos_g is None:
         print('无效的客人索引！')
         print(f'-' * 20)
         return
+    # get the screen shot
     img = cv.fast_screen_shot(pos_lt, pos_rb)
+    t2 = time.time()
     # generate item list
     item_list = {}
     for item, name in [
@@ -334,7 +350,9 @@ def __feed_guest_image_recognition(guest_index: int) -> None:
         (cv.img_shutiao, 'shutiao'),
     ]:
         res = cv.match_many_object_on_image(img, item, draw_rect=True)
+        # update number of items
         item_list[name] = len(res)
+    t3 = time.time()
     # show window
     cv.to_show_image.put((cv.WINDOW_NAME_GUEST, img))
     print(f'客人 {guest_index} 的物品列表：{item_list}')
@@ -354,24 +372,29 @@ def __feed_guest_image_recognition(guest_index: int) -> None:
         __feed_shutiao_image_recognition(pos_g, item_list['shutiao'])
     # feed the rest cola
     if item_list['cola_b'] > 1:
-        sleep(1)
+        sleep(1.2)
         __feed_cola_2(pos_g)
     if item_list['cola_o'] > 1:
-        sleep(1)
+        sleep(1.2)
         __feed_cola_1(pos_g)
+    t4 = time.time()
     sha.move_to(POS_TABLE_CENTER)
+    print(f'截图 {(t2 - t1)*1000:.2f} 毫秒，识别 {(t3 - t2)*1000:.2f} 毫秒，喂食 {(t4 - t3)*1000:.2f} 毫秒')
+    print('-' * 20 + '\n')
 
 
 def feed_guest(guest_pos: Tuple[int, int]) -> None:
-    Thread(target=__feed_guest, args=(guest_pos,), daemon=True).start()
+    # Thread(target=__feed_guest, args=(guest_pos,), daemon=True).start()
+    EXECUTOR.submit(__feed_guest, guest_pos)
 
 
 def feed_guest_image_recognition(guest_index: int) -> None:
-    Thread(target=__feed_guest_image_recognition, args=(guest_index,), daemon=True).start()
+    # Thread(target=__feed_guest_image_recognition, args=(guest_index,), daemon=True).start()
+    EXECUTOR.submit(__feed_guest_image_recognition, guest_index)
 
 
 async def handle_key_press(key):
-    if key in {keyboard.Key.esc, keyboard.Key.alt, keyboard.Key.cmd}:
+    if key in {keyboard.Key.esc}:
         # Stop listener
         return False
     try:
@@ -424,11 +447,7 @@ async def handle_key_press(key):
 
 
 async def handle_key_release(key):
-    if key in {keyboard.Key.esc, keyboard.Key.alt, keyboard.Key.cmd}:
-        # Stop listener
-        return False
-    # tab
-    elif key == keyboard.Key.tab:
+    if key == keyboard.Key.tab:
         disable_super_click()
     # d
     try:
@@ -460,7 +479,6 @@ if __name__ == '__main__':
     # Start super click thread
     Thread(target=super_click_thread, daemon=True).start()
     cv.init_show_windows()
-    print('按下 ESC 退出')
     print(__doc__)
     # Collect events until released
     with keyboard.Listener(

@@ -93,13 +93,13 @@ async def swipe_async(pos1: Tuple[int, int], pos2: Tuple[int, int], duration=0.2
 
 def swipe(pos1: Tuple[int, int], pos2: Tuple[int, int], drag_mode: int = DRAG_MODE_FAST) -> None:
     move_to(pos1)
-    sleep(.05)
+    sleep(.1)
     win32api.mouse_event(
         win32con.MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0)
     sleep(.1)
     if drag_mode == DRAG_MODE_TELEPORT:
         move_to(pos2)
-        sleep(.08)
+        sleep(.03)
         win32api.mouse_event(
             win32con.MOUSEEVENTF_LEFTUP, 0, 0, 0, 0)
         return
