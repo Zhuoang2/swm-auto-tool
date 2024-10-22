@@ -4,4 +4,4 @@
 
 img/PixPin*
 img/capture*
-test/
+test/__test_*.png
