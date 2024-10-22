@@ -182,7 +182,7 @@ def super_add_dish_sauce_pack():
         return
     sha.move_to(POS_TABLE_CENTER)
     print('-' * 20)
-    print(f'制作一个沙威玛耗时 {(time.time() - t1)*1000:.2f} 毫秒\n')
+    print(f'制作一个沙威玛耗时 {(time.time() - t1) * 1000:.2f} 毫秒\n')
 
 
 def super_fry_potato():
@@ -308,36 +308,22 @@ def __feed_guest(guest_pos: Tuple[int, int]) -> None:
     print(f'[7] 客人 {guest_pos} 喂食完成，耗时 {t2 - t1:.2f} 秒')
 
 
-def __feed_guest_image_recognition(guest_index: int) -> None:
+def __feed_guest_image_recognition(pos_left_top: Tuple[int, int],
+                                   pos_right_bottom: Tuple[int, int],
+                                   pos_guest_center: Tuple[int, int]) -> None:
+    """
+    通过图像识别喂食客人
+    :param pos_left_top: 客人气泡左上角
+    :param pos_right_bottom: 客人气泡右下角
+    :param pos_guest_center: 客人中心位置
+    :return:
+    """
     print(f'=' * 20)
-    print(f'开始识别 {guest_index} 的需求')
+    print(f'开始识别 {pos_guest_center} 的需求')
     t1 = time.time()
-    # find the guest position
-    pos_lt = None
-    pos_rb = None
-    pos_g = None
-    if guest_index == 1:
-        pos_lt = POS_GUEST_1_LT
-        pos_rb = POS_GUEST_1_RB
-        pos_g = POS_GUEST_1
-    elif guest_index == 2:
-        pos_lt = POS_GUEST_2_LT
-        pos_rb = POS_GUEST_2_RB
-        pos_g = POS_GUEST_2
-    elif guest_index == 3:
-        pos_lt = POS_GUEST_3_LT
-        pos_rb = POS_GUEST_3_RB
-        pos_g = POS_GUEST_3
-    elif guest_index == 4:
-        pos_lt = POS_GUEST_4_LT
-        pos_rb = POS_GUEST_4_RB
-        pos_g = POS_GUEST_4
-    if pos_lt is None or pos_rb is None or pos_g is None:
-        print('无效的客人索引！')
-        print(f'-' * 20)
-        return
+
     # get the screen shot
-    img = cv.fast_screen_shot(pos_lt, pos_rb)
+    img = cv.fast_screen_shot(pos_left_top, pos_right_bottom)
     t2 = time.time()
     # generate item list
     item_list = {}
@@ -355,31 +341,31 @@ def __feed_guest_image_recognition(guest_index: int) -> None:
     t3 = time.time()
     # show window
     cv.to_show_image.put((cv.WINDOW_NAME_GUEST, img))
-    print(f'客人 {guest_index} 的物品列表：{item_list}')
+    print(f'客人 {pos_guest_center} 的物品列表：{item_list}')
     # if cola is larger than 1, we first feed cola
     if item_list['cola_b'] > 0:
-        __feed_cola_2(pos_g)
+        __feed_cola_2(pos_guest_center)
     if item_list['cola_o'] > 0:
-        __feed_cola_1(pos_g)
+        __feed_cola_1(pos_guest_center)
     # feed other items
     if item_list['swm'] > 0:
-        __feed_swm_image_recognition(pos_g, item_list['swm'])
+        __feed_swm_image_recognition(pos_guest_center, item_list['swm'])
     if item_list['box'] > 0:
-        __feed_drink(pos_g, item_list['box'])
+        __feed_drink(pos_guest_center, item_list['box'])
     if item_list['digua'] > 0:
-        __feed_digua(pos_g, item_list['digua'])
+        __feed_digua(pos_guest_center, item_list['digua'])
     if item_list['shutiao'] > 0:
-        __feed_shutiao_image_recognition(pos_g, item_list['shutiao'])
+        __feed_shutiao_image_recognition(pos_guest_center, item_list['shutiao'])
     # feed the rest cola
     if item_list['cola_b'] > 1:
         sleep(1.2)
-        __feed_cola_2(pos_g)
+        __feed_cola_2(pos_guest_center)
     if item_list['cola_o'] > 1:
         sleep(1.2)
-        __feed_cola_1(pos_g)
+        __feed_cola_1(pos_guest_center)
     t4 = time.time()
     sha.move_to(POS_TABLE_CENTER)
-    print(f'截图 {(t2 - t1)*1000:.2f} 毫秒，识别 {(t3 - t2)*1000:.2f} 毫秒，喂食 {(t4 - t3)*1000:.2f} 毫秒')
+    print(f'截图 {(t2 - t1) * 1000:.2f} 毫秒，识别 {(t3 - t2) * 1000:.2f} 毫秒，喂食 {(t4 - t3) * 1000:.2f} 毫秒')
     print('-' * 20 + '\n')
 
 
@@ -388,9 +374,18 @@ def feed_guest(guest_pos: Tuple[int, int]) -> None:
     EXECUTOR.submit(__feed_guest, guest_pos)
 
 
-def feed_guest_image_recognition(guest_index: int) -> None:
+def feed_guest_image_recognition(pos_left_top: Tuple[int, int],
+                                 pos_right_bottom: Tuple[int, int],
+                                 pos_guest_center: Tuple[int, int]) -> None:
+    """
+    通过图像识别喂食客人
+    :param pos_left_top: 客人气泡左上角
+    :param pos_right_bottom: 客人气泡右下角
+    :param pos_guest_center: 客人中心位置
+    :return:
+    """
     # Thread(target=__feed_guest_image_recognition, args=(guest_index,), daemon=True).start()
-    EXECUTOR.submit(__feed_guest_image_recognition, guest_index)
+    EXECUTOR.submit(__feed_guest_image_recognition, pos_left_top, pos_right_bottom, pos_guest_center)
 
 
 async def handle_key_press(key):
@@ -430,16 +425,16 @@ async def handle_key_press(key):
             sha.move_to(POS_DIGUA)
         elif key.char == '1':
             # feed_guest(POS_GUEST_1)
-            feed_guest_image_recognition(1)
+            feed_guest_image_recognition(POS_GUEST_1, POS_GUEST_1_LT, POS_GUEST_1_RB)
         elif key.char == '2':
             # feed_guest(POS_GUEST_2)
-            feed_guest_image_recognition(2)
+            feed_guest_image_recognition(POS_GUEST_2, POS_GUEST_2_LT, POS_GUEST_2_RB)
         elif key.char == '3':
             # feed_guest(POS_GUEST_3)
-            feed_guest_image_recognition(3)
+            feed_guest_image_recognition(POS_GUEST_3, POS_GUEST_3_LT, POS_GUEST_3_RB)
         elif key.char == '4':
             # feed_guest(POS_GUEST_4)
-            feed_guest_image_recognition(4)
+            feed_guest_image_recognition(POS_GUEST_4, POS_GUEST_4_LT, POS_GUEST_4_RB)
 
     except AttributeError:
         if key == keyboard.Key.tab:
