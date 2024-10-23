@@ -309,7 +309,7 @@ POS_GUEST_5_RB = (xxx, xxx)
 
 > 还有一个 `__feed_guest_image_recognition` 函数，这是最终会被放到线程池上执行的回调函数，内部实现了喂食的具体逻辑，目前我们无需直接与它打交道。
 
-上述函数接受三个参数：客人中心点、客人气泡左上角点、客人气泡右下角点。
+上述函数接受三个参数：**(客人气泡左上角点, 客人气泡右下角点, 客人中心点)** 传错顺序会导致图像识别不工作，但是不会输出任何报错信息。
 
 
 接着绑定快捷键，修改 `main.py` 内的 `handle_key_press` 函数，添加一个新的 if 分支，比如：
@@ -325,11 +325,11 @@ async def handle_key_press(key):
         # 原有
         elif key.char == '4':
             # feed_guest(POS_GUEST_4)
-            feed_guest_image_recognition(POS_GUEST_4, POS_GUEST_4_LT, POS_GUEST_4_RB)
+            feed_guest_image_recognition(POS_GUEST_4_LT, POS_GUEST_4_RB, POS_GUEST_4)
 
         # 追加
         elif key.char == '5':
-			feed_guest_image_recognition(POS_GUEST_5, POS_GUEST_5_LT, POS_GUEST_5_RB)
+			feed_guest_image_recognition(POS_GUEST_5_LT, POS_GUEST_5_RB, POS_GUEST_5)
     # ...
 ```
 

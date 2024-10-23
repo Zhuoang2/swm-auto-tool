@@ -318,11 +318,12 @@ def __feed_guest_image_recognition(pos_left_top: Tuple[int, int],
     :param pos_guest_center: 客人中心位置
     :return:
     """
+    print(f'debug __feed_guest_image_recognition {pos_left_top} {pos_right_bottom} {pos_guest_center}')
     print(f'=' * 20)
     print(f'开始识别 {pos_guest_center} 的需求')
     t1 = time.time()
 
-    # get the screen shot
+    # get the screenshot
     img = cv.fast_screen_shot(pos_left_top, pos_right_bottom)
     t2 = time.time()
     # generate item list
@@ -370,8 +371,8 @@ def __feed_guest_image_recognition(pos_left_top: Tuple[int, int],
 
 
 def feed_guest(guest_pos: Tuple[int, int]) -> None:
-    # Thread(target=__feed_guest, args=(guest_pos,), daemon=True).start()
-    EXECUTOR.submit(__feed_guest, guest_pos)
+    Thread(target=__feed_guest, args=(guest_pos,), daemon=True).start()
+    # EXECUTOR.submit(__feed_guest, guest_pos)
 
 
 def feed_guest_image_recognition(pos_left_top: Tuple[int, int],
@@ -384,7 +385,10 @@ def feed_guest_image_recognition(pos_left_top: Tuple[int, int],
     :param pos_guest_center: 客人中心位置
     :return:
     """
-    # Thread(target=__feed_guest_image_recognition, args=(guest_index,), daemon=True).start()
+    # Thread(target=__feed_guest_image_recognition,
+    #        args=(pos_left_top, pos_right_bottom, pos_guest_center),
+    #        daemon=True).start()
+    # print(f'debug feed_guest_image_recognition {pos_left_top} {pos_right_bottom} {pos_guest_center}')
     EXECUTOR.submit(__feed_guest_image_recognition, pos_left_top, pos_right_bottom, pos_guest_center)
 
 
@@ -425,16 +429,16 @@ async def handle_key_press(key):
             sha.move_to(POS_DIGUA)
         elif key.char == '1':
             # feed_guest(POS_GUEST_1)
-            feed_guest_image_recognition(POS_GUEST_1, POS_GUEST_1_LT, POS_GUEST_1_RB)
+            feed_guest_image_recognition(POS_GUEST_1_LT, POS_GUEST_1_RB, POS_GUEST_1)
         elif key.char == '2':
             # feed_guest(POS_GUEST_2)
-            feed_guest_image_recognition(POS_GUEST_2, POS_GUEST_2_LT, POS_GUEST_2_RB)
+            feed_guest_image_recognition(POS_GUEST_2_LT, POS_GUEST_2_RB, POS_GUEST_2)
         elif key.char == '3':
             # feed_guest(POS_GUEST_3)
-            feed_guest_image_recognition(POS_GUEST_3, POS_GUEST_3_LT, POS_GUEST_3_RB)
+            feed_guest_image_recognition(POS_GUEST_3_LT, POS_GUEST_3_RB, POS_GUEST_3)
         elif key.char == '4':
             # feed_guest(POS_GUEST_4)
-            feed_guest_image_recognition(POS_GUEST_4, POS_GUEST_4_LT, POS_GUEST_4_RB)
+            feed_guest_image_recognition(POS_GUEST_4_LT, POS_GUEST_4_RB, POS_GUEST_4)
 
     except AttributeError:
         if key == keyboard.Key.tab:
