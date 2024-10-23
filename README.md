@@ -25,7 +25,7 @@ Python 开发的快捷键实现自动鼠标控制沙威玛辅助工具。**有�
 - `opencv-python` 图像识别
 - `rich` 彩色控制台输出
 
-安装方法： `pip install pyperclip pynput mss opencv-python rich`
+安装方法： `pip install pyperclip pywin32 pynput mss opencv-python rich`
 
 运行方法：在项目目录下，打开终端，运行 `python main.py`
 
