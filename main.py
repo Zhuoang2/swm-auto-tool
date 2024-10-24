@@ -318,7 +318,7 @@ def __feed_guest_image_recognition(pos_left_top: Tuple[int, int],
     :param pos_guest_center: 客人中心位置
     :return:
     """
-    print(f'debug __feed_guest_image_recognition {pos_left_top} {pos_right_bottom} {pos_guest_center}')
+    # print(f'debug __feed_guest_image_recognition {pos_left_top} {pos_right_bottom} {pos_guest_center}')
     print(f'=' * 20)
     print(f'开始识别 {pos_guest_center} 的需求')
     t1 = time.time()
@@ -379,7 +379,7 @@ def feed_guest_image_recognition(pos_left_top: Tuple[int, int],
                                  pos_right_bottom: Tuple[int, int],
                                  pos_guest_center: Tuple[int, int]) -> None:
     """
-    通过图像识别喂食客人
+    通过图像识别喂食客人. **传参顺序：左上角，右下角，客人中心**
     :param pos_left_top: 客人气泡左上角
     :param pos_right_bottom: 客人气泡右下角
     :param pos_guest_center: 客人中心位置
@@ -388,7 +388,11 @@ def feed_guest_image_recognition(pos_left_top: Tuple[int, int],
     # Thread(target=__feed_guest_image_recognition,
     #        args=(pos_left_top, pos_right_bottom, pos_guest_center),
     #        daemon=True).start()
-    # print(f'debug feed_guest_image_recognition {pos_left_top} {pos_right_bottom} {pos_guest_center}')
+
+    # check arguments order
+    if pos_guest_center[0] > pos_left_top[0] or pos_guest_center[0] > pos_right_bottom[0]:
+        print('[yellow]传入的客人坐标可能有误：客人中心点应当位于气泡区域的左侧（比左上角、右下角均更靠左），'
+              '但现在位于气泡区域中间或右侧。如果图像识别不工作，请检查传参顺序。[/]')
     EXECUTOR.submit(__feed_guest_image_recognition, pos_left_top, pos_right_bottom, pos_guest_center)
 
 

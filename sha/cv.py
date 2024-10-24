@@ -143,6 +143,10 @@ def fast_screen_shot(left_up: Tuple[int, int], right_down: Tuple[int, int], save
     :param save:  是否保存到文件
     :return:  截图
     """
+    # ensure correct corner coordinates
+    if not (left_up[0] < right_down[0] and left_up[1] < right_down[1]):
+        msg = f'截图坐标错误：左上角坐标应小于右下角坐标。传入参数 left_up: {left_up}, right_down: {right_down}'
+        raise ValueError(msg)
     with mss.mss() as sct:
         # Define the monitor area to capture
         monitor = {'top': left_up[1], 'left': left_up[0], 'width': right_down[0] - left_up[0],
