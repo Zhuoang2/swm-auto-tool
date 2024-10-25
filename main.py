@@ -16,6 +16,8 @@ from rich import print
 
 SUPER_CLICK = False
 EXECUTOR = ThreadPoolExecutor(max_workers=1)
+# global var to implement print_once function
+print_once_done = False
 
 __doc__ = """
 [bold yellow]按下 ESC 键即退出，防止在其他程序内启用脚本。[/]
@@ -32,6 +34,13 @@ __doc__ = """
 1、2、3、4（非小键盘）可以识别客人需求，自动喂食
 
 """
+
+
+def print_once(*args, **kwargs):
+    global print_once_done
+    if not print_once_done:
+        print(*args, **kwargs)
+        print_once_done = True
 
 
 def enable_super_click():
@@ -391,8 +400,9 @@ def feed_guest_image_recognition(pos_left_top: Tuple[int, int],
 
     # check arguments order
     if pos_guest_center[0] > pos_left_top[0] or pos_guest_center[0] > pos_right_bottom[0]:
-        print('[yellow]传入的客人坐标可能有误：客人中心点应当位于气泡区域的左侧（比左上角、右下角均更靠左），'
-              '但现在位于气泡区域中间或右侧。如果图像识别不工作，请检查传参顺序。[/]')
+        print_once(f'[yellow]传入的客人坐标可能有误：客人中心点 {pos_guest_center} 应当位于气泡区域的左侧'
+                   f'（比左上角{pos_left_top}、右下角{pos_right_bottom}均更靠左），'
+                   '但现在位于气泡区域中间或右侧。如果图像识别不工作，请检查传参顺序。如正常，可忽略此消息。[/]')
     EXECUTOR.submit(__feed_guest_image_recognition, pos_left_top, pos_right_bottom, pos_guest_center)
 
 
