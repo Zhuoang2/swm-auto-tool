@@ -453,6 +453,9 @@ async def handle_key_press(key):
         elif key.char == '4':
             # feed_guest(POS_GUEST_4)
             feed_guest_image_recognition(POS_GUEST_4_LT, POS_GUEST_4_RB, POS_GUEST_4)
+        elif key.char == '5':
+            # feed_guest(POS_GUEST_5)
+            feed_guest_image_recognition(POS_GUEST_5_LT, POS_GUEST_5_RB, POS_GUEST_5)
 
     except AttributeError:
         if key == keyboard.Key.tab:

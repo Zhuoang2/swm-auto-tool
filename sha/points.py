@@ -1,8 +1,8 @@
 # 桌子上那四个菜的位置
-POS_DISH_1 = (518, 740)
-POS_DISH_2 = (670, 750)
-POS_DISH_3 = (819, 744)
-POS_DISH_4 = (974, 745)
+POS_DISH_1 = (507, 735)
+POS_DISH_2 = (662, 729)
+POS_DISH_3 = (822, 735)
+POS_DISH_4 = (985, 737)
 
 # 桌子上正在包的沙威玛的位置：
 # 从哪里开始滑动
@@ -43,41 +43,44 @@ POS_TABLE_RB = (1300, 1000)
 POS_DRINK = (430, 860)
 
 # 地瓜的位置
-POS_DIGUA = (1165, 710)
+POS_DIGUA = (1179, 690)
 
 # 客人的位置中心点
-POS_GUEST_1 = (716, 524)
-POS_GUEST_2 = (1008, 515)
-POS_GUEST_3 = (1310, 506)
-POS_GUEST_4 = (1513, 493)
+POS_GUEST_1 = (644, 502)
+POS_GUEST_2 = (757, 587)
+POS_GUEST_3 = (942, 358)
+POS_GUEST_4 = (1021, 591)
+POS_GUEST_5 = (1704, 480)
 
 # 【视觉识别】客人弹出的需求气泡的区域，LT左上角，RB右下角，编号从左往右，1就是最左边的客人
-POS_GUEST_4_LT = (1495, 309)
-POS_GUEST_4_RB = (1686, 627)
+POS_GUEST_5_LT = (1737, 348)
+POS_GUEST_5_RB = (1814, 588)
 
-POS_GUEST_3_LT = (1224, 300)
-POS_GUEST_3_RB = (1377, 601)
+POS_GUEST_4_LT = (1467, 362)
+POS_GUEST_4_RB = (1551, 574)
 
-POS_GUEST_2_LT = (942, 305)
-POS_GUEST_2_RB = (1127, 633)
+POS_GUEST_3_LT = (1209, 364)
+POS_GUEST_3_RB = (1284, 585)
 
-POS_GUEST_1_LT = (653, 297)
-POS_GUEST_1_RB = (815, 656)
+POS_GUEST_2_LT = (942, 358)
+POS_GUEST_2_RB = (1021, 591)
+
+POS_GUEST_1_LT = (678, 359)
+POS_GUEST_1_RB = (757, 587)
 
 # 可乐机的按钮。升级了自动灌装则不需要。
 POS_COCA_1 = (1345, 628)
 POS_COCA_2 = (1419, 626)
 
 # 可乐机灌装好后，2个杯子的位置。1黄色的，2黑色的。
-POS_COCA_CUP_1 = (1346, 740)
-POS_COCA_CUP_2 = (1411, 722)
+POS_COCA_CUP_1 = (1350, 717)
+POS_COCA_CUP_2 = (1418, 711)
 
 # 三个炸薯条的位置，此坐标点已弃用，改用图像识别
 POS_FRY_1 = (1549, 816)
 POS_FRY_2 = (1630, 813)
 POS_FRY_3 = (1707, 814)
-
-# 炸薯条包装位置，升级了包装自动飞过来则不需要
+ # 炸薯条包装位置，升级了包装自动飞过来则不需要
 POS_FRY_PACKAGE = (1551, 903)
 
 # 【视觉识别】炸薯条区域的左上角，右下角
